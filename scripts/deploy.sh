@@ -1,18 +1,18 @@
 #!/bin/bash
 
 # AKS cluster name
-aksPrefix="<aks-cluster-prefix>"
+aksPrefix="mytenant"
 aksName="${aksPrefix}Aks"
 validateTemplate=1
 useWhatIf=0
 
 # ARM template and parameters file
-template="./azuredeploy.json"
-parameters="./azuredeploy.parameters.json"
+template="./templates/azuredeploy.json"
+parameters="./templates/azuredeploy.parameters.json"
 
 # Name and location of the resource group for the Azure Kubernetes Service (AKS) cluster
 aksResourceGroupName="${aksPrefix}RG"
-location="WestEurope"
+location="southcentralus"
 
 # Name and resource group name of the Azure Container Registry used by the AKS cluster.
 # The name of the cluster is also used to create or select an existing admin group in the Azure AD tenant.
@@ -112,16 +112,19 @@ fi
 # Create AKS cluster if does not exist
 echo "Checking if [$aksName] aks cluster actually exists in the [$aksResourceGroupName] resource group..."
 
-az aks show --name $aksName --resource-group $aksResourceGroupName &>/dev/null
+#az aks show --name $aksName --resource-group $aksResourceGroupName &>/dev/null
+AKS=$(az aks list --resource-group $aksResourceGroupName --query "[?name == '$aksName'].name" --output table)
 
-if [[ $? != 0 ]]; then
+if [[ -z "$AKS" ]]; then
     echo "No [$aksName] aks cluster actually exists in the [$aksResourceGroupName] resource group"
 
     # Delete any existing role assignments for the user-defined managed identity of the AKS cluster
     # in case you are re-deploying the solution in an existing resource group
     echo "Retrieving the list of role assignments on [$aksResourceGroupName] resource group..."
+    echo "az role assignment list --scope subscriptions/${subscriptionId}/resourceGroups/${aksResourceGroupName} --query [].id --output tsv"
+
     assignmentIds=$(az role assignment list \
-        --scope "/subscriptions/${subscriptionId}/resourceGroups/${aksResourceGroupName}" \
+        --scope "subscriptions/${subscriptionId}/resourceGroups/${aksResourceGroupName}" \
         --query [].id \
         --output tsv)
 
@@ -164,10 +167,7 @@ if [[ $? != 0 ]]; then
                 if [[ -n $acrId ]]; then
                     acrName=$(echo $acrId | awk -F '/' '{print $NF}')
                     echo "Retrieving the list of role assignments on [$acrName] ACR..."
-                    assignmentIds=$(az role assignment list \
-                        --scope "$acrId" \
-                        --query [].id \
-                        --output tsv)
+                    assignmentIds=$(az role assignment list --scope "$acrId" --query [].id --output tsv)
 
                     if [[ -n $assignmentIds ]]; then
                         echo "[${#assignmentIds[@]}] role assignments have been found on [$acrName] ACR"
@@ -212,7 +212,7 @@ if [[ $? != 0 ]]; then
                 echo "[$template] ARM template validation succeeded"
             else
                 echo "Failed to validate [$template] ARM template"
-                exit
+                #exit
             fi
         else
             # Validate the ARM template
@@ -232,7 +232,7 @@ if [[ $? != 0 ]]; then
             else
                 echo "Failed to validate [$template] ARM template"
                 echo $output
-                exit
+                #exit
             fi
         fi
     fi
@@ -254,7 +254,7 @@ if [[ $? != 0 ]]; then
         echo "[$template] ARM template successfully provisioned"
     else
         echo "Failed to provision the [$template] ARM template"
-        exit
+        #exit
     fi
 else
     echo "[$aksName] aks cluster already exists in the [$aksResourceGroupName] resource group"
@@ -267,7 +267,7 @@ if [[ -n $userPrincipalName ]]; then
     echo "[$userPrincipalName] user principal name successfully retrieved from the [$tenantId] Azure AD tenant"
 else
     echo "Failed to retrieve the user principal name of the current user from the [$tenantId] Azure AD tenant"
-    exit
+    #exit
 fi
 
 # Retrieve the objectId of the user in the Azure AD tenant used by AKS for user authentication
@@ -278,7 +278,7 @@ if [[ -n $userObjectId ]]; then
     echo "[$userObjectId] objectId successfully retrieved for the [$userPrincipalName] user principal name"
 else
     echo "Failed to retrieve the objectId of the [$userPrincipalName] user principal name"
-    exit
+    #exit
 fi
 
 # Retrieve the resource id of the AKS cluster
@@ -293,7 +293,7 @@ if [[ -n $aksClusterId ]]; then
     echo "Resource id of the [$aksName] AKS cluster successfully retrieved"
 else
     echo "Failed to retrieve the resource id of the [$aksName] AKS cluster"
-    exit
+    #exit
 fi
 
 # Assign Azure Kubernetes Service RBAC Cluster Admin role to the current user
@@ -320,6 +320,6 @@ else
         echo "[$userPrincipalName] user successfully assigned to the [Azure Kubernetes Service RBAC Cluster Admin] role on the [$aksName] AKS cluster"
     else
         echo "Failed to assign the [$userPrincipalName] user to the [Azure Kubernetes Service RBAC Cluster Admin] role on the [$aksName] AKS cluster"
-        exit
+        #exit
     fi
 fi

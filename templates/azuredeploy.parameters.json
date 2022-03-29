@@ -33,7 +33,7 @@
       "value": "azadmin"
     },
     "aksClusterSshPublicKey": {
-      "value": "<YOUR-SSH-KEY>"
+      "value": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDCRxsjWc9XTQXecqjMuIlD171bad9GiEtviCPBLzZBr64d1Ygz5vtkuz0A7OT93HXQXVlD+QZPJ5NUFYgdSs76LzhUD5A7h7Kej5W2nUzdBfuNNaIEPwFLEWKATnSxeaIfMtPTSRhipzNPu800YI+Pidl8n5NuA4zZ0COjpQN3A62ZrwGYAQn4urom4cs6U/FlK6LeM/aPcAsLzgQnY9BK6T6Eyd6lpIZuWTjCvz3WHeZPZ7XfIrRrwB/bun0AigxzAPAPJaVPNkVRVDd+KMZ1JpJUtRh1VbEl9PnB/JuWzJz7c9OrDl3GabZ+uXsoCmycp81N4A9bfpXMhQPm2NXxcf5k4gd/K8Yi6IWtIRS4eD3w53bGEvoa+rlChwcO1Rl+Kqusa11S5QIZ9ZU88SE/hSCFbz+Qp93fOVyo9XMOrpmxhEXNQPQ2oqZrS5LeB8/VPNQ89S73/snG7rblpiR93L2iRLBIqkx5Yr8C2sZSq9M1336KDc23KdJKcE66Hx0= generated-by-azure"
     },
     "aadProfileManaged": {
       "value": true
@@ -43,7 +43,7 @@
     },
     "aadProfileAdminGroupObjectIDs": {
       "value": [
-        "<OBJECT-ID-OF-AAD-ADMIN-GROUP>"
+        "734c2a6e-015c-4c1a-b955-ca625b933a14"
       ]
     },
     "podIdentityProfileEnabled": {
@@ -133,7 +133,7 @@
       "value": "azadmin"
     },
     "vmAdminPasswordOrKey": {
-      "value": "<YOU-PASSWORD>"
+      "value": "P@ssword1"
     }
   }
 }
